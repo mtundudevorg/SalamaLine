@@ -1,0 +1,38 @@
+.env
+!.env*
+# Python temporary files & caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Model weights & Checkpoints (Heavy Files)
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+*.h5
+uploads/
+uploads/*
+
+
+# Large Dataset files & Logs
+*.csv
+*.xlsx
+*.log
+runs/
+
+# IDE & OS settings
+.vscode/
+.idea/
+.DS_Store
