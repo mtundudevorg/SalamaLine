@@ -4,9 +4,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     DATABASE_URL: str
     APP_NAME: str
-    DEBUG:str
+    DEBUG:bool
     DESCRIPTION:str
     VERSION:str
+    SECRET_KEY:str
+    EXPIRE_ACCESS_TOKEN:int
+    ALGORITHM:str
 
     model_config = SettingsConfigDict(
         env_file=".env",
