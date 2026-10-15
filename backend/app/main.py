@@ -6,6 +6,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from contextlib import asynccontextmanager
 
 
+from app.api.routers import user_router,auth_router,seed
+
 @asynccontextmanager
 async def lifespan(app:FastAPI):
     try:
@@ -24,7 +26,9 @@ app=FastAPI(title=settings.APP_NAME,
             description=settings.DESCRIPTION,
             lifespan=lifespan)
 
-
+app.include_router(auth_router.router)
+app.include_router(user_router.router)
+app.include_router(seed.router)
 
 
 @app.get("/health",tags=["Health"])
