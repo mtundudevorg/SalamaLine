@@ -12,41 +12,6 @@ from app.core.security import hashing
 
 class USerServices:
     
-    
-    @staticmethod
-    def usercreate(db:Session,data:UserCeate):
-        existing_user=db.query(User).filter(User.email==data.email and User.Phone==data.Phone).first()
-        if existing_user:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="already have an account")
-        if not data.email and data.phone:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="one or both email or phone number is required")
-        
-        user=User(
-            full_name=data.full_name,
-            password=hashing.hash_password(data.password),
-            Phone=data.Phone,
-            email=data.email,
-            is_active=True
-            
-        )
-        
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-        
-        role=db.query(Role).filter(Role.name=="user").first()
-        
-        roleuser=RoleUser(
-            user_id=user.id,
-            role_id=role.id
-        )
-        db.add(roleuser)
-        db.commit()
-        
-        
-        return user
-        
-     
     @staticmethod
     def all_user(db:Session,page,limit,sort,search):
         user=db.query(User)
@@ -86,28 +51,29 @@ class USerServices:
               "has_previous":page>1
             },
             "user":user
-        }  
+        } 
+         
+    @staticmethod
+    def Authme(db:Session,current_user):
+        user=db.query(User).filter(User.id==current_user.id).first()
+        return user
               
     @staticmethod
-    def single_user(db:Session,user_id):
-        user=db.query(User).filter(User.id==user_id).first()
-        if not user:
+    def single_user(db:Session,user_id,current_user):
+        user=db.query(User).filter(User.id==user_id).first()            
+        roles=[ur.role.name for ur in current_user.roleuser]
+        if "admin" not in roles and not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with id {user_id} not found")                    
-        
         return user
     
     @staticmethod
-    def update_user(db:Session,data:UserUpdate,user_id):
+    def update_user(db:Session,data:UserUpdate,user_id,current_user):
         user=db.query(User).filter(User.id==user_id).first()
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with id {user_id} not found")
-                           
-        # user=db.query(User).filter(User.email==data.email,User.Phone==data.Phone).first()
-        # if user:
-        #     raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="email or password all used")
-        # if not data.email and data.phone:
-        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="one or both email or phone number is required")
-        
+        roles=[ur.role.name for ur in current_user.roleuser]
+        if "admin" not in roles and current_user.id != user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="you not have access to perfom this action")
         user.full_name=data.full_name
         user.email=data.email
         user.Phone=data.Phone
@@ -120,10 +86,13 @@ class USerServices:
     
     
     @staticmethod
-    def delete_user(db:Session,user_id):
+    def delete_user(db:Session,user_id,current_user):
         user=db.query(User).filter(User.id==user_id).first()
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with iid  {user_id} not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with id  {user_id} not found")
+        roles=[ur.role.name for ur in current_user.roleuser]
+        if "admin" not in roles and current_user.id != user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="you not have access to perfom this action")        
         db.delete(user)
         db.commit()
         
