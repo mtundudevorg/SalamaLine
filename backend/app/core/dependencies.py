@@ -29,13 +29,13 @@ def get_current_user(db:Session=Depends(get_db),token:str=Depends(oauth2_schema)
 def role_required(required_role:str):
     def role_check(db:Session=Depends(get_db),
                      current_user:User=Depends(get_current_user)):
-        roles=db.query(RoleUser).join(RoleUser,RoleUser.role_id==Role.id).filter(RoleUser.user_id==current_user.id).all()
-        role_name={role.name for role in roles}
+        roles=db.query(Role).join(RoleUser,RoleUser.role_id==Role.id).filter(RoleUser.user_id==current_user.id).all()
+        role_name=[role.name for role in roles]
         if "admin" in role_name:
             return current_user
         
         if required_role not in role_name:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="invalid Role")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="fail to identify your role")
         
         return current_user
     return role_check
