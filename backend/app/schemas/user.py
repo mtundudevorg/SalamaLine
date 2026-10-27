@@ -1,4 +1,4 @@
-from pydantic import BaseModel,EmailStr,ConfigDict
+from pydantic import BaseModel,EmailStr,ConfigDict,Field
 from typing import Optional,List
 from datetime import datetime
 
@@ -8,7 +8,7 @@ class UserCeate(BaseModel):
     full_name:str
     email:Optional[EmailStr]=None
     password:str
-    Phone:Optional[str]=None
+    Phone:Optional[str]=Field(examples=["0618982523"])
     
 class UserUpdate(BaseModel):
     full_name:str
