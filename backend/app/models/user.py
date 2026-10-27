@@ -13,8 +13,11 @@ class User(Base):
     Phone=Column(String,nullable=True,unique=True)
     password=Column(String,nullable=False)
     is_active=Column(Boolean,default=True)
+    is_email_verified=Column(Boolean,nullable=False,default=False)
+    is_phone_verified=Column(Boolean,nullable=False,default=False)
     created_at=Column(DateTime,default=datetime.now)
     updated_at=Column(DateTime,default=datetime.now,onupdate=datetime.now)
     
     
     roleuser=relationship("RoleUser",back_populates="user",cascade="all, delete-orphan")
+    verify=relationship("Verification",back_populates="user")

@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from contextlib import asynccontextmanager
 
 
-from app.api.routers import user_router,auth_router,seed
+from app.api.routers import user_router,auth_router,seed,verification
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -28,6 +28,7 @@ app=FastAPI(title=settings.APP_NAME,
 
 app.include_router(auth_router.router)
 app.include_router(user_router.router)
+app.include_router(verification.router)
 app.include_router(seed.router)
 
 
